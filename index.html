@@ -4,56 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>汽水音乐解析 - 高清完整版</title>
+    <title>汽水音乐解析 - 完整版提取</title>
     <style>
         :root { --main-color: #00ebff; --bg-color: #121212; --card-bg: #1e1e1e; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg-color); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        /* 稍微加宽容器以展示高清大图 */
-        .box { width: 95%; max-width: 450px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align: center; }
-        h2 { color: var(--main-color); margin-bottom: 20px; font-weight: 600; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .box { width: 90%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
         input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #2c2c2c; color: #fff; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--main-color); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        button:hover { opacity: 0.8; }
+        button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--main-color); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .loading { display: none; color: var(--main-color); margin: 15px 0; font-size: 14px; }
         #result { margin-top: 25px; display: none; }
-        /* 设置封面尺寸为 600x600 比例，并自适应容器 */
-        img#cover { width: 100%; aspect-ratio: 1 / 1; border-radius: 15px; object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 20px; }
-        .song-info { margin-bottom: 20px; }
-        audio { width: 100%; margin-top: 10px; height: 45px; }
+        img { width: 180px; height: 180px; border-radius: 15px; object-fit: cover; }
+        audio { width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="box">
     <h2>汽水音乐解析</h2>
-    <input type="text" id="urlInput" placeholder="粘贴汽水音乐分享链接...">
-    <button onclick="doParse()" id="btnText">解析高清完整版</button>
-    <div id="loading" class="loading">📡 正在提取 600x600 高清素材...</div>
+    <input type="text" id="urlInput" placeholder="在此粘贴汽水音乐链接...">
+    <button onclick="doParse()" id="btnText">立即提取完整版</button>
+    <div id="loading" class="loading">🔍 正在深度扫描完整音源轨道...</div>
     
     <div id="result">
-        <img id="cover" src="" alt="cover">
-        <div class="song-info">
-            <div id="title" style="font-size: 20px; font-weight: bold;"></div>
-            <div id="artist" style="color: #aaa; font-size: 15px; margin-top: 5px;"></div>
+        <img id="cover" src="">
+        <div style="margin: 15px 0;">
+            <div id="title" style="font-size: 18px; font-weight: bold;"></div>
+            <div id="artist" style="color: #aaa; font-size: 14px; margin-top: 5px;"></div>
         </div>
         <audio id="player" controls></audio>
-        <button style="background: #34c759; color: #fff; margin-top: 15px;" onclick="doDownload()">📥 下载高清音频</button>
+        <button style="background: #34c759; color: #fff;" onclick="doDownload()">下载到本地 (MP3)</button>
     </div>
 </div>
 
 <script>
     let currentMusic = null;
 
+    // 1. 链接清洗
     function cleanUrl(text) {
         const match = text.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);
         return match ? match[0] : null;
     }
 
-    // 智能提取完整版链接，过滤预览版
+    // 2. 深度过滤：排除所有带 preview 和 30s 标签的链接
     function findFullAudioUrl(obj) {
         let urls = [];
         const scan = (item) => {
             if (typeof item === 'string' && item.startsWith('http')) {
+                // 只保留包含音频特征且不含预览特征的链接
                 if ((item.includes('music') || item.includes('.mp3')) && 
                     !item.includes('preview') && !item.includes('30s')) {
                     urls.push(item);
@@ -63,6 +60,7 @@
             }
         };
         scan(obj);
+        // 返回最长的链接，通常完整版参数更丰富
         return urls.sort((a, b) => b.length - a.length)[0];
     }
 
@@ -77,10 +75,11 @@
         return null;
     }
 
+    // 3. 核心解析
     async function doParse() {
         const raw = document.getElementById('urlInput').value;
         const target = cleanUrl(raw);
-        if(!target) return alert("链接无效");
+        if(!target) return alert("请粘贴有效的汽水链接");
 
         document.getElementById('loading').style.display = 'block';
         document.getElementById('result').style.display = 'none';
@@ -91,25 +90,28 @@
             const res = await fetch(api);
             const html = await res.text();
             const match = html.match(/_ROUTER_DATA\s*=\s*({[\s\S]*?});/);
+            if(!match) throw new Error("提取页面数据失败");
+            
             const json = JSON.parse(match[1]);
             
-            // 提取基础信息
+            // 优先定位老文件的核心对象
             const trackInfo = json?.loaderData?.track_page?.audioWithLyricsOption || 
                               json?.loaderData?.['track_page/index']?.audioWithLyricsOption;
 
-            // --- 核心修改：封面图片尺寸替换为 600x600 ---
-            let rawCover = trackInfo?.coverURL || findField(json, 'coverURL') || "";
-            let hdCover = rawCover.replace(/~\d+x\d+/, '~600x600'); // 动态修改 URL 尺寸参数
+            // 智能筛选：如果核心对象里的 url 带 preview，则开启全局扫描
+            let finalUrl = trackInfo?.url;
+            if (!finalUrl || finalUrl.includes('preview')) {
+                finalUrl = findFullAudioUrl(json);
+            }
+
+            if(!finalUrl) throw new Error("未发现完整音源，可能该歌曲受限");
 
             currentMusic = {
-                title: trackInfo?.trackName || findField(json, 'trackName') || "未知歌曲",  
-标题 :  曲目信息 ?. 曲目名称  ||  查找字段 (json, '曲目名称') || "未知歌曲",
+                title: trackInfo?.trackName || findField(json, 'trackName') || "未知歌曲",
                 artist: trackInfo?.artistName || findField(json, 'artistName') || "未知歌手",
-                cover: hdCover,
-                url: findFullAudioUrl(json)
+                cover: trackInfo?.coverURL || findField(json, 'coverURL') || "",
+                url: finalUrl
             };
-
-            if(!currentMusic.url) throw new Error("未找到完整版音频");
 
             document.getElementById('title').innerText = currentMusic.title;
             document.getElementById('artist').innerText = currentMusic.artist;
