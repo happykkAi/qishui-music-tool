@@ -4,114 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>汽水音乐解析 - 深度过滤版</title>
+    <title>汽水音乐解析 - 完整版提取</title>
     <style>
         :root { --main-color: #00ebff; --bg-color: #121212; --card-bg: #1e1e1e; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .box { width: 90%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
-        h2 { color: var(--main-color); margin-bottom: 20px; }
         input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #2c2c2c; color: #fff; box-sizing: border-box; outline: none; }
         button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--main-color); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .loading { display: none; color: var(--main-color); margin: 15px 0; font-size: 14px; }
         #result { margin-top: 25px; display: none; }
-        img { width: 180px; height: 180px; border-radius: 15px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        audio { width: 100%; margin-top: 10px; }
+        img { width: 180px; height: 180px; border-radius: 15px; object-fit: cover; }
+        audio { width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="box">
     <h2>汽水音乐解析</h2>
-    <input type="text" id="urlInput" placeholder="在此粘贴链接...">
-    <button onclick="doParse()" id="btnText">立即解析完整版</button>
-    <div id="loading" class="loading">🔍 正在扫描完整音源轨道...</div>
+    <input type="text" id="urlInput" placeholder="在此粘贴汽水音乐链接...">
+    <button onclick="doParse()" id="btnText">立即提取完整版</button>
+    <div id="loading" class="loading">🔍 正在深度扫描完整音源轨道...</div>
     
     <div id="result">
         <img id="cover" src="">
         <div style="margin: 15px 0;">
             <div id="title" style="font-size: 18px; font-weight: bold;"></div>
-            <div id="artist" style="color: #aaa; font-size: 14px;"></div>
+            <div id="artist" style="color: #aaa; font-size: 14px; margin-top: 5px;"></div>
         </div>
         <audio id="player" controls></audio>
-        <button style="background: #34c759; color: #fff;" onclick="doDownload()">下载 MP3</button>
+        <button style="background: #34c759; color: #fff;" onclick="doDownload()">下载到本地 (MP3)</button>
     </div>
 </div>
 
 <script>
     let currentMusic = null;
 
+    // 1. 链接清洗
     function cleanUrl(text) {
         const match = text.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);
         return match ? match[0] : null;
     }
 
-    // --- 核心逻辑：全量搜索并过滤 30s 预览链接 ---
-    function findFullUrl(obj) {
-        let allUrls = [];
-        
-        // 1. 递归提取 JSON 中所有的 URL 字符串
-        function collect(data) {
-            if (typeof data === 'string' && data.startsWith('http')) {
-                // 只收集音频类后缀或包含特定关键字的链接
-                if (data.includes('.mp3') || data.includes('mime_type=audio') || data.includes('music')) {
-                    allUrls.push(data);
+    // 2. 深度过滤：排除所有带 preview 和 30s 标签的链接
+    function findFullAudioUrl(obj) {
+        let urls = [];
+        const scan = (item) => {
+            if (typeof item === 'string' && item.startsWith('http')) {
+                // 只保留包含音频特征且不含预览特征的链接
+                if ((item.includes('music') || item.includes('.mp3')) && 
+                    !item.includes('preview') && !item.includes('30s')) {
+                    urls.push(item);
                 }
-            } else if (typeof data === 'object' && data !== null) {
-                for (let key in data) collect(data[key]);
+            } else if (typeof item === 'object' && item !== null) {
+                for (let k in item) scan(item[k]);
             }
-        }
-        collect(obj);
-
-        // 2. 过滤规则：优先排除包含 "preview" 或 "30s" 的链接
-        // 汽水音乐的预览链接通常包含这些关键词
-        const fullUrls = allUrls.filter(u => !u.toLowerCase().includes('preview') && !u.toLowerCase().includes('30s'));
-        
-        console.log("所有发现的链接:", allUrls);
-        console.log("过滤后的完整链接:", fullUrls);
-
-        // 返回过滤后的第一个链接，如果没有，则退而求其次返回第一个发现的链接
-        return fullUrls.length > 0 ? fullUrls[0] : allUrls[0];
+        };
+        scan(obj);
+        // 返回最长的链接，通常完整版参数更丰富
+        return urls.sort((a, b) => b.length - a.length)[0];
     }
 
-    function getSimpleField(obj, key) {
+    function findField(obj, key) {
         if (obj && obj[key]) return obj[key];
         for (let k in obj) {
             if (typeof obj[k] === 'object') {
-                let res = getSimpleField(obj[k], key);
+                let res = findField(obj[k], key);
                 if (res) return res;
             }
         }
         return null;
     }
 
+    // 3. 核心解析
     async function doParse() {
-        const input = document.getElementById('urlInput').value;
-        const targetUrl = cleanUrl(input);
-        if(!targetUrl) return alert("请粘贴正确的汽水链接");
+        const raw = document.getElementById('urlInput').value;
+        const target = cleanUrl(raw);
+        if(!target) return alert("请粘贴有效的汽水链接");
 
         document.getElementById('loading').style.display = 'block';
         document.getElementById('result').style.display = 'none';
-        document.getElementById('btnText').disabled = true;
 
-        const proxy = `https://qishui-music-tool.luokaikaichina.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
+        const api = `https://qishui-music-tool.luokaikaichina.workers.dev/?url=${encodeURIComponent(target)}`;
 
         try {
-            const res = await fetch(proxy);
+            const res = await fetch(api);
             const html = await res.text();
             const match = html.match(/_ROUTER_DATA\s*=\s*({[\s\S]*?});/);
-            if(!match) throw new Error("无法读取页面数据");
+            if(!match) throw new Error("提取页面数据失败");
             
             const json = JSON.parse(match[1]);
-
-            // 使用智能搜索获取 URL
-            const finalUrl = findFullUrl(json);
             
-            if(!finalUrl) throw new Error("未发现音频地址");
+            // 优先定位老文件的核心对象
+            const trackInfo = json?.loaderData?.track_page?.audioWithLyricsOption || 
+                              json?.loaderData?.['track_page/index']?.audioWithLyricsOption;
+
+            // 智能筛选：如果核心对象里的 url 带 preview，则开启全局扫描
+            let finalUrl = trackInfo?.url;
+            if (!finalUrl || finalUrl.includes('preview')) {
+                finalUrl = findFullAudioUrl(json);
+            }
+
+            if(!finalUrl) throw new Error("未发现完整音源，可能该歌曲受限");
 
             currentMusic = {
-                title: getSimpleField(json, 'trackName') || "未知歌曲",
-                artist: getSimpleField(json, 'artistName') || "未知歌手",
-                cover: getSimpleField(json, 'coverURL') || "",
+                title: trackInfo?.trackName || findField(json, 'trackName') || "未知歌曲",
+                artist: trackInfo?.artistName || findField(json, 'artistName') || "未知歌手",
+                cover: trackInfo?.coverURL || findField(json, 'coverURL') || "",
                 url: finalUrl
             };
 
@@ -125,7 +123,6 @@
             alert("解析出错: " + e.message);
         } finally {
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('btnText').disabled = false;
         }
     }
 
