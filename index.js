@@ -3,51 +3,41 @@ export default {
     const url = new URL(request.url);
     const targetUrl = url.searchParams.get('url');
 
-    // 预检请求处理 (解决 CORS)
+    // 1. 核心：处理跨域预检 (CORS Preflight)
+    // 浏览器在正式请求前会发一个 OPTIONS 请求，如果不处理就会报“响应异常”
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "*",
+    };
+
     if (request.method === "OPTIONS") {
-      return new Response(null, {  
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
-        },
-      });
+      return new Response(null, { headers: corsHeaders });
     }
 
-    if (!targetUrl) return new Response("缺少 url 参数", { status: 400 });
+    if (!targetUrl) return new Response("Missing URL", { status: 400, headers: corsHeaders });
 
     try {
-      // 深度模拟 iPhone 浏览器请求
       const response = await fetch(targetUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'zh-CN,zh;q=0.9',
-          'Referer': 'https://qishui.douyin.com/',
-          'Cache-Control': 'no-cache'
-        },
-        redirect: 'follow' // 必须跟随重定向
+          'Referer': 'https://qishui.douyin.com/'
+        }
       });
-
-      if (!response.ok) {
-        return new Response(`汽水音乐响应错误: ${response.status}`, { 
-          status: response.status,
-          headers: { "Access-Control-Allow-Origin": "*" }
-        });
-      }
 
       const body = await response.text();
       
+      // 2. 返回结果时必须再次附带 corsHeaders
       return new Response(body, {
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          ...corsHeaders,
           'Content-Type': 'text/html;charset=UTF-8'
         }
       });
     } catch (e) {
-      return new Response("Worker 内部错误: " + e.message, { 
-        status: 500,
-        headers: { "Access-Control-Allow-Origin": "*" }
+      return new Response("Error: " + e.message, { 
+        status: 500, 
+        headers: corsHeaders 
       });
     }
   }
