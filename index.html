@@ -4,97 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>汽水音乐解析 - Pro版</title>
+    <title>汽水音乐解析 - 稳定私有版</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; padding: 20px; }
-        .box { max-width: 400px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #2c2c2c; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #00ebff; color: #000; font-weight: bold; cursor: pointer; }
-        #result { margin-top: 20px; display: none; }
-        img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
-        audio { width: 100%; margin-top: 10px; }
-        .loading { color: #00ebff; display: none; margin: 10px 0; }
+        :root { --main-color: #00ebff; --bg-color: #121212; --card-bg: #1e1e1e; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .box { width: 90%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        h2 { color: var(--main-color); margin-bottom: 20px; font-weight: 600; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #2c2c2c; color: #fff; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--main-color); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .loading { display: none; color: var(--main-color); margin: 15px 0; font-size: 14px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        #result { margin-top: 25px; display: none; }
+        img { width: 180px; height: 180px; border-radius: 15px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.3); margin-bottom: 15px; }
+        .song-info { margin-bottom: 15px; }
+        audio { width: 100%; margin-top: 10px; height: 40px; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h2>汽水解析下载</h2>
-    <input type="text" id="urlInput" placeholder="在此粘贴汽水音乐分享链接">
-    <button onclick="doParse()">开始解析</button>
-    <div id="loading" class="loading">正在穿透解析中...</div>
+    <h2>汽水音乐解析</h2>
+    <input type="text" id="urlInput" placeholder="粘贴分享链接或文字...">
+    <button onclick="doParse()" id="btnText">立即解析</button>
+    <div id="loading" class="loading">⚡ 正在通过私有通道解析...</div>
     
     <div id="result">
         <img id="cover" src="" alt="cover">
-        <h3 id="title"></h3>
-        <p id="artist"></p>
+        <div class="song-info">
+            <div id="title" style="font-size: 18px; font-weight: bold;"></div>
+            <div id="artist" style="color: #aaa; font-size: 14px; margin-top: 5px;"></div>
+        </div>
         <audio id="player" controls></audio>
-        <button style="background: #34c759; margin-top: 10px;" onclick="doDownload()">下载到本地</button>
+        <button style="background: #34c759; color: #fff;" onclick="doDownload()">下载 MP3</button>
     </div>
 </div>
 
 <script>
     let currentMusic = null;
 
+    // 提取链接
+    function cleanUrl(text) {
+        const match = text.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);
+        return match ? match[0] : null;
+    }
+
+    // 递归寻找数据结构
+    function findKey(obj, key) {
+        if (!obj || typeof obj !== 'object') return null;
+        if (obj[key]) return obj[key];
+        for (let k in obj) {
+            let found = findKey(obj[k], key);
+            if (found) return found;
+        }
+        return null;
+    }
+
     async function doParse() {
-        const input = document.getElementById('urlInput').value;
-        const match = input.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);
+        const rawInput = document.getElementById('urlInput').value;
+        const targetUrl = cleanUrl(rawInput);
         
-        if(!match) return alert("请输入正确的汽水音乐分享链接！");
+        if(!targetUrl) return alert("链接格式不正确，请重新复制。");
 
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('result').style.display = 'none';
+        const btn = document.getElementById('btnText');
+        const loader = document.getElementById('loading');
+        const resDiv = document.getElementById('result');
 
-        // 使用代理绕过 CORS
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(match[0])}`;
+        btn.disabled = true;
+        loader.style.display = 'block';
+        resDiv.style.display = 'none';
+
+        // --- 核心修改：使用你的专属代理地址 ---
+        const myProxy = `https://qishuimusic-proxy.pages.dev/?url=${encodeURIComponent(targetUrl)}`;
 
         try {
-            const res = await fetch(proxyUrl);
-            if(!res.ok) throw new Error("代理服务器响应失败");
+            const res = await fetch(myProxy);
+            if(!res.ok) throw new Error("代理响应异常，请检查 Cloudflare 设置");
             const html = await res.text();
 
-            // 解析 _ROUTER_DATA
+            // 匹配解析逻辑
             const matchData = html.match(/_ROUTER_DATA\s*=\s*({[\s\S]*?});/);
-            if(!matchData) throw new Error("未能提取到音频数据，可能是链接已失效或解析方案需更新");
+            if(!matchData) throw new Error("无法提取页面数据，可能链接已失效");
             
             const json = JSON.parse(matchData[1]);
-            const track = json?.loaderData?.track_page?.audioWithLyricsOption || 
-                          json?.loaderData?.['track_page/index']?.audioWithLyricsOption;
-
-            if(!track) throw new Error("解析失败：找不到音频地址");
-
+            
+            // 提取关键字段
             currentMusic = {
-                title: track.trackName,
-                artist: track.artistName,
-                cover: track.coverURL,
-                url: track.url
+                title: findKey(json, 'trackName') || "未知歌曲",
+                artist: findKey(json, 'artistName') || "未知歌手",
+                cover: findKey(json, 'coverURL') || "",
+                url: findKey(json, 'url') 
             };
+
+            if(!currentMusic.url) throw new Error("未能找到音频地址");
 
             document.getElementById('title').innerText = currentMusic.title;
             document.getElementById('artist').innerText = currentMusic.artist;
             document.getElementById('cover').src = currentMusic.cover;
             document.getElementById('player').src = currentMusic.url;
-            document.getElementById('result').style.display = 'block';
+            resDiv.style.display = 'block';
 
         } catch (e) {
-            alert("错误: " + e.message);
+            alert("解析失败: " + e.message);
         } finally {
-            document.getElementById('loading').style.display = 'none';
+            loader.style.display = 'none';
+            btn.disabled = false;
         }
     }
 
-    async function doDownload() {
+    function doDownload() {
         if(!currentMusic) return;
-        // 注意：部分浏览器可能会因为跨域禁止直接下载，此时会跳转到原链接
-        try {
-            const a = document.createElement('a');
-            a.href = currentMusic.url;
-            a.download = `${currentMusic.title}.mp3`;
-            a.target = "_blank";
-            a.click();
-        } catch (e) {
-            window.open(currentMusic.url);
-        }
+        // 尝试直接下载
+        const a = document.createElement('a');
+        a.href = currentMusic.url;
+        a.download = `${currentMusic.title}-${currentMusic.artist}.mp3`;
+        a.target = "_blank";
+        a.click();
     }
 </script>
 </body>
