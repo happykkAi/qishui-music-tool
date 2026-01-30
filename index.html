@@ -1,131 +1,24 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>汽水音乐解析 - 稳定私有版</title>
-    <style>
-        :root { --main-color: #00ebff; --bg-color: #121212; --card-bg: #1e1e1e; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg-color); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .box { width: 90%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
-        h2 { color: var(--main-color); margin-bottom: 20px; font-weight: 600; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #2c2c2c; color: #fff; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--main-color); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
-        .loading { display: none; color: var(--main-color); margin: 15px 0; font-size: 14px; }
-        #result { margin-top: 25px; display: none; }
-        img { width: 180px; height: 180px; border-radius: 15px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.3); margin-bottom: 15px; }
-        .song-info { margin-bottom: 15px; }
-        audio { width: 100%; margin-top: 10px; height: 40px; }
-    </style>
-</head>
-<body>
+async function doParse() {  
+    // ... 前面的 UI 逻辑保持不变 ...
+    const myProxy = `https://qishui-music-tool.luokaikaichina.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
 
-<div class="box">
-    <h2>汽水音乐解析</h2>
-    <input type="text" id="urlInput" placeholder="在此粘贴汽水音乐分享链接...">
-    <button onclick="doParse()" id="btnText">立即解析</button>
-    <div id="loading" class="loading">⚡ 正在通过私有通道解析数据...</div>
-    
-    <div id="result">
-        <img id="cover" src="" alt="cover">
-        <div class="song-info">
-            <div id="title" style="font-size: 18px; font-weight: bold;"></div>
-            <div id="artist" style="color: #aaa; font-size: 14px; margin-top: 5px;"></div>
-        </div>
-        <audio id="player" controls></audio>
-        <button style="background: #34c759; color: #fff;" onclick="doDownload()">下载到本地</button>
-    </div>
-</div>
-
-<script>
-    let currentMusic = null;
-
-    // 1. 工具函数：从杂乱文字中提取 URL
-    function cleanUrl(text) {
-        const match = text.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);
-        return match ? match[0] : null;
-    }
-
-    // 2. 工具函数：在复杂的 JSON 树中深度搜索目标键值
-    function findKey(obj, key) {
-        if (!obj || typeof obj !== 'object') return null;
-        if (obj[key]) return obj[key];
-        for (let k in obj) {
-            let found = findKey(obj[k], key);
-            if (found) return found;
-        }
-        return null;
-    }
-
-    // 3. 核心解析逻辑
-    async function doParse() {
-        const rawInput = document.getElementById('urlInput').value;
-        const targetUrl = cleanUrl(rawInput);
+    try {
+        const res = await fetch(myProxy);
         
-        if(!targetUrl) return alert("请输入有效的汽水音乐链接！");
-
-        const btn = document.getElementById('btnText');
-        const loader = document.getElementById('loading');
-        const resDiv = document.getElementById('result');
-
-        btn.disabled = true;
-        loader.style.display = 'block';
-        resDiv.style.display = 'none';
-
-        // 指向你已经验证成功的 Worker 地址
-        const myProxy = `https://qishui-music-tool.luokaikaichina.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
-
-        try {
-            const res = await fetch(myProxy);
-            if(!res.ok) throw new Error("后端代理响应失败，状态码: " + res.status);
-            const html = await res.text();
-
-            // 匹配网页中的加密数据块
-            const matchData = html.match(/_ROUTER_DATA\s*=\s*({[\s\S]*?});/);
-            if(!matchData) throw new Error("无法从页面中提取数据，请尝试重新复制链接");
-            
-            const json = JSON.parse(matchData[1]);
-            
-            // 使用深度搜索提取音频信息，适配多种页面结构
-            currentMusic = {
-                title: findKey(json, 'trackName') || "未知歌名",
-                artist: findKey(json, 'artistName') || "未知歌手",
-                cover: findKey(json, 'coverURL') || "",
-                url: findKey(json, 'url') 
-            };
-
-            if(!currentMusic.url) throw new Error("已找到页面数据，但未发现有效音频地址");
-
-            // 填充界面
-            document.getElementById('title').innerText = currentMusic.title;
-            document.getElementById('artist').innerText = currentMusic.artist;
-            document.getElementById('cover').src = currentMusic.cover;
-            document.getElementById('player').src = currentMusic.url;
-            resDiv.style.display = 'block';
-
-        } catch (e) {
-            console.error(e);
-            alert("解析失败: " + e.message);
-        } finally {
-            loader.style.display = 'none';
-            btn.disabled = false;
+        // 如果这里报错，说明是跨域或网络问题
+        if(!res.ok) {
+            console.error("HTTP错误状态:", res.status);
+            throw new Error(`服务器返回了错误码: ${res.status}。请检查 Worker 部署日志。`);
         }
-    }
 
-    // 4. 下载逻辑
-    function doDownload() {
-        if(!currentMusic) return;
-        // 注意：部分浏览器会拦截自动下载，此时会跳转到音频原链接进行播放/手动保存
-        const a = document.createElement('a');
-        a.href = currentMusic.url;
-        a.download = `${currentMusic.title}-${currentMusic.artist}.mp3`;
-        a.target = "_blank";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const html = await res.text();
+        
+        // ... 后面的匹配解析逻辑保持不变 ...
+    } catch (e) {
+        // 如果是跨域错误，这里通常会提示 "Failed to fetch"
+        alert("解析失败: " + e.message + "\n建议: 按 F12 查看 Console 的具体错误信息。");
+    } finally {
+        loader.style.display = 'none';
+        btn.disabled = false;
     }
-</script>
-</body>
-</html>
+}
