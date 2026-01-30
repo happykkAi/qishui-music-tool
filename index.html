@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="zh-CN"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="referrer" content="no-referrer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;汽水音乐解析下载&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--primary: #00ebff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--bg: #0a0a0c;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--card-bg: #16161a;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--text: #ffffff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>--text-dim: #a0a0a0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: -apple-system, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.container { max-width: 500px; margin: 0 auto; padding: 20px; }</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>header { text-align: center; padding: 40px 0 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>header h1 { font-size: 24px; color: var(--primary); letter-spacing: 1px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>header p { font-size: 12px; color: var(--text-dim); margin-top: 5px; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.input-box {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: var(--card-bg);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 30px rgba(0,0,0,0.5);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>input {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #252529;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid #333;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: 0.3s;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#parseBtn { background: var(--primary); color: #000; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#parseBtn:active { opacity: 0.7; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 音乐结果卡片 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#resultCard {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: var(--card-bg);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>animation: slideUp 0.4s ease;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 30px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.cover-area { position: relative; width: 100%; aspect-ratio: 1; background: #222; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#musicCover { width: 100%; height: 100%; object-fit: cover; }</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.info-area { padding: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#musicTitle { font-size: 18px; font-weight: bold; margin-bottom: 5px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#musicArtist { font-size: 14px; color: var(--text-dim); margin-bottom: 15px; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>audio { width: 100%; filter: invert(100%); margin-bottom: 15px; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>#downloadBtn { background: #34c759; color: #fff; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>.status { text-align: center; font-size: 14px; color: var(--primary); margin: 10px 0; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.hidden { display: none; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.spinning { animation: spin 1s linear infinite; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;header&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;&lt;i class="ri-rhythm-line"&gt;&lt;/i&gt; QISHUI DECODER&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;输入汽水音乐分享链接 即可解析 MP3&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="input-box"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="musicUrl" placeholder="粘贴链接：https://qishui.douyin.com/s/..."&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="parseBtn"&gt;&lt;i class="ri-focus-3-line"&gt;&lt;/i&gt; 立即解析&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="statusInfo" class="status hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;i class="ri-loader-5-line spinning"&gt;&lt;/i&gt; 正在处理中...</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="resultCard" class="hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="cover-area"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;img id="musicCover" src="" alt=""&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="info-area"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="musicTitle"&gt;歌曲加载中...&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="musicArtist"&gt;歌手&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;audio id="player" controls controlslist="nodownload"&gt;&lt;/audio&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="downloadBtn"&gt;&lt;i class="ri-download-2-line"&gt;&lt;/i&gt; 下载音频文件&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const $ = id =&gt; document.getElementById(id);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let musicData = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>$('parseBtn').onclick = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const input = $('musicUrl').value;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const urlMatch = input.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!urlMatch) return alert("请贴入正确的汽水音乐分享链接");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>$('statusInfo').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>$('resultCard').classList.add('hidden');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 代理列表：优先使用 allorigins，因为其对抖音域名限制较少</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const proxies = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`https://api.allorigins.win/raw?url=${encodeURIComponent(urlMatch[0])}`,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`https://corsproxy.io/?${encodeURIComponent(urlMatch[0])}`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let html = "";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for (let p of proxies) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const res = await fetch(p);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if(res.ok) { html = await res.text(); break; }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (e) {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>$('statusInfo').classList.add('hidden');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!html) return alert("解析失败，可能是代理服务器连接超时，请重试");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const dataMatch = html.match(/_ROUTER_DATA\s*=\s*({[\s\S]*?});/);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(!dataMatch) throw new Error("链接可能已失效");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const json = JSON.parse(dataMatch[1]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const track = json?.loaderData?.track_page?.audioWithLyricsOption;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(!track) throw new Error("无法提取音乐信息");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>musicData = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>title: track.trackName,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>artist: track.artistName,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>cover: track.coverURL,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>url: track.url</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>$('musicTitle').innerText = musicData.title;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>$('musicArtist').innerText = musicData.artist;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>$('musicCover').src = musicData.cover;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>$('player').src = musicData.url;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>$('resultCard').classList.remove('hidden');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (e) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>alert("解析失败：" + e.message);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>$('downloadBtn').onclick = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!musicData) return;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>$('downloadBtn').innerText = "正在拉取数据...";</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const res = await fetch(musicData.url);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const blob = await res.blob();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const url = URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const a = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.download = `${musicData.title} - ${musicData.artist}.mp3`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>a.click();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>URL.revokeObjectURL(url);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (e) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 备选方案：直接打开链接</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.open(musicData.url, '_blank');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>$('downloadBtn').innerHTML = '&lt;i class="ri-download-2-line"&gt;&lt;/i&gt; 下载音频文件';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
