@@ -1,24 +1,111 @@
-async function doParse() {  
-    // ... 前面的 UI 逻辑保持不变 ...
-    const myProxy = `https://qishui-music-tool.luokaikaichina.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>汽水音乐解析 - 最终修复版</title>
+    <style>
+        :root { --main-color: #00ebff; --bg-color: #121212; --card-bg: #1e1e1e; }
+        body { font-family: sans-serif; background: var(--bg-color); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .box { width: 90%; max-width: 400px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        input { width: 100%; padding: 14px; margin: 15px 0; border-radius: 12px; border: 1px solid #333; background: #2c2c2c; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--main-color); color: #000; font-weight: bold; cursor: pointer; }
+        #result { margin-top: 25px; display: none; }
+        img { width: 180px; height: 180px; border-radius: 15px; margin-bottom: 15px; }
+        audio { width: 100%; margin-top: 10px; }
+        .loading { display: none; color: var(--main-color); margin-bottom: 10px; }
+    </style>
+</head>
+<body>
 
-    try {
-        const res = await fetch(myProxy);
-        
-        // 如果这里报错，说明是跨域或网络问题
-        if(!res.ok) {
-            console.error("HTTP错误状态:", res.status);
-            throw new Error(`服务器返回了错误码: ${res.status}。请检查 Worker 部署日志。`);
-        }
+<div class="box">
+    <h2>汽水音乐解析</h2>
+    <input type="text" id="urlInput" placeholder="在此粘贴汽水音乐链接">
+    <div id="loading" class="loading">正在通过 Cloudflare 解析中...</div>
+    <button onclick="doParse()" id="btnText">开始解析</button>
+    
+    <div id="result">
+        <img id="cover" src="">
+        <h3 id="title" style="margin: 5px 0;"></h3>
+        <p id="artist" style="color: #aaa; margin-bottom: 15px;"></p>
+        <audio id="player" controls></audio>
+        <button style="background: #34c759; color: #fff; margin-top: 10px;" onclick="doDownload()">下载到本地</button>
+    </div>
+</div>
 
-        const html = await res.text();
-        
-        // ... 后面的匹配解析逻辑保持不变 ...
-    } catch (e) {
-        // 如果是跨域错误，这里通常会提示 "Failed to fetch"
-        alert("解析失败: " + e.message + "\n建议: 按 F12 查看 Console 的具体错误信息。");
-    } finally {
-        loader.style.display = 'none';
-        btn.disabled = false;
+<script>
+    let currentMusic = null;
+
+    function cleanUrl(text) {
+        const match = text.match(/https?:\/\/qishui\.douyin\.com\/s\/[a-zA-Z0-9]+\/?/);
+        return match ? match[0] : null;
     }
-}
+
+    function findKey(obj, key) {
+        if (!obj || typeof obj !== 'object') return null;
+        if (obj[key]) return obj[key];
+        for (let k in obj) {
+            let found = findKey(obj[k], key);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    async function doParse() {
+        const input = document.getElementById('urlInput').value;
+        const targetUrl = cleanUrl(input);
+        if(!targetUrl) return alert("链接格式不正确！");
+
+        const loader = document.getElementById('loading');
+        const resDiv = document.getElementById('result');
+        const btn = document.getElementById('btnText');
+
+        loader.style.display = 'block';
+        resDiv.style.display = 'none';
+        btn.disabled = true;
+
+        // 指向你的专属代理
+        const myProxy = `https://qishui-music-tool.luokaikaichina.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
+
+        try {
+            const res = await fetch(myProxy);
+            if(!res.ok) throw new Error("代理服务器返回错误: " + res.status);
+            
+            const html = await res.text();
+            const matchData = html.match(/_ROUTER_DATA\s*=\s*({[\s\S]*?});/);
+            if(!matchData) throw new Error("解析失败：未能提取到页面数据");
+            
+            const json = JSON.parse(matchData[1]);
+            
+            currentMusic = {
+                title: findKey(json, 'trackName') || "未知歌名",
+                artist: findKey(json, 'artistName') || "未知歌手",
+                cover: findKey(json, 'coverURL') || "",
+                url: findKey(json, 'url')
+            };
+
+            if(!currentMusic.url) throw new Error("解析成功但未发现音频链接");
+
+            document.getElementById('title').innerText = currentMusic.title;
+            document.getElementById('artist').innerText = currentMusic.artist;
+            document.getElementById('cover').src = currentMusic.cover;
+            document.getElementById('player').src = currentMusic.url;
+            resDiv.style.display = 'block';
+
+        } catch (e) {
+            alert("错误: " + e.message);
+            console.error(e);
+        } finally {
+            loader.style.display = 'none';
+            btn.disabled = false;
+        }
+    }
+
+    function doDownload() {
+        if(!currentMusic) return;
+        window.open(currentMusic.url, '_blank');
+    }
+</script>
+</body>
+</html>
